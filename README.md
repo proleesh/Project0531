@@ -70,7 +70,7 @@ sns.barplot(data = sex_income, x = 'sex', y = 'mean_income')
 ```
 plt.rcParams['font.family'] = 'D2Coding'
 
-raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
 welfare = raw_welfare.copy()
 welfare = welfare.rename(columns = {'h14_g3':'sex',
                                     'h14_g4':'birth',
@@ -112,7 +112,7 @@ plt.show()
 #한글 폰트 지정
 plt.rcParams['font.family'] = 'D2Coding'
 
-raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
 welfare = raw_welfare.copy()
 welfare = welfare.rename(columns = {'h14_g3':'sex',
                                     'h14_g4':'birth',
@@ -152,7 +152,7 @@ plt.show()
 ```
 plt.rcParams['font.family'] = 'D2Coding'
 
-raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
 welfare = raw_welfare.copy()
 welfare = welfare.rename(columns = {'h14_g3':'sex',
                                     'h14_g4':'birth',
