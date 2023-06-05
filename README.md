@@ -1,5 +1,8 @@
 # 한국인의 삶을 분석하고 파악하라
-## 프로젝트 팀원: 송우석(2,3,4번 완성 끝), 이성혁(5번완성, 작업중...)
+=========================================
+## 시작일시: 2023.05.31
+=========================================
+## 프로젝트 팀원: 송우석(2,3,4번 완성 끝), 이성혁(5번완성, MD작성완성)
 ## 분석하고자 하는 문제 정의 (가설)
 > 1. 성별에 따라 월급이 다를까?
 > 2. 몇 살 때 월급을 가장 많이 받을까?
@@ -55,13 +58,161 @@ sex_income = welfare.dropna(subset = ['income']).groupby('sex', as_index = False
 
 sns.barplot(data = sex_income, x = 'sex', y = 'mean_income')
 ```
-#### 히스토그램:
+#### 히스토그램
 ![income](https://github.com/proleesh/proleesh/assets/57159010/dada0a2b-58fe-485f-b8bf-27e22b909334)
-#### 막대그래프:
+#### 막대그래프
 ![sex_income](https://github.com/proleesh/proleesh/assets/57159010/06c83ac7-78c5-49b6-82ea-f348204ef98b)
 > 결론: 관계가 있다.
 
-## 5. 어떤 직업이 월급을 가장 많이 받을까?
+## 2. 몇 살 때 월급을 가장 많이 받을까? [송우석님 작성]
+
+#### 실현 코드:
+```
+plt.rcParams['font.family'] = 'D2Coding'
+
+raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+welfare = raw_welfare.copy()
+welfare = welfare.rename(columns = {'h14_g3':'sex',
+                                    'h14_g4':'birth',
+                                    'h14_g10':'marriage_type',
+                                    'h14_g11':'religion',
+                                    'p1402_8aq1':'income',
+                                    'h14_eco9':'code_job',
+                                    'h14_reg7':'code_region'})
+
+# birth열로 나이 계산해 age열 생성
+welfare['age'] = 2019-welfare['birth']
+age_income = welfare.dropna(subset = ['income'])\
+    .groupby('age', as_index = False)\
+        .agg(average_income = ('income', 'mean'))
+
+# 10대~90대 구간의 경계값 설정
+bins = [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
+labels = ['10대', '20대', '30대', '40대', '50대', '60대', '70대', '80대', '90대']
+
+# 경계값을 기준으로 나누고, 라벨을 붙여서 age_income 데이터프레임에 age_group열을 만듦
+age_income['age_group'] = pd.cut(age_income['age'], bins=9, labels=labels)
+age_group_income = age_income\
+    .groupby('age_group', as_index = False)\
+        .agg(average_income = ('average_income', 'mean'))
+
+# 40대의 월급이 가장 많다.
+sns.barplot(data = age_group_income, x = 'age_group', y = 'average_income')
+plt.show()
+```
+
+#### 막대그래프
+![프로젝트2번_age_income](https://github.com/proleesh/Project0531/assets/57159010/f7727ae5-3cdf-4e43-b7e0-496022db8f2d)
+>결론: 43세가 평균 월급을 가장 많이 받는다.
+
+## 3. 어떤 연령대의 월급이 가장 많을까?[송우석님 작성]
+
+#### 실현 코드:
+````
+#한글 폰트 지정
+plt.rcParams['font.family'] = 'D2Coding'
+
+raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+welfare = raw_welfare.copy()
+welfare = welfare.rename(columns = {'h14_g3':'sex',
+                                    'h14_g4':'birth',
+                                    'h14_g10':'marriage_type',
+                                    'h14_g11':'religion',
+                                    'p1402_8aq1':'income',
+                                    'h14_eco9':'code_job',
+                                    'h14_reg7':'code_region'})
+
+# birth열로 나이 계산해 age열 생성
+welfare['age'] = 2019-welfare['birth']
+age_income = welfare.dropna(subset = ['income'])\
+    .groupby('age', as_index = False)\
+        .agg(average_income = ('income', 'mean'))
+
+# 10대~90대 구간의 경계값 설정
+bins = [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
+labels = ['10대', '20대', '30대', '40대', '50대', '60대', '70대', '80대', '90대']
+
+# 경계값을 기준으로 나누고, 라벨을 붙여서 age_income 데이터프레임에 age_group열을 만듦
+age_income['age_group'] = pd.cut(age_income['age'], bins=9, labels=labels)
+age_group_income = age_income\
+    .groupby('age_group', as_index = False)\
+        .agg(average_income = ('average_income', 'mean'))
+
+# 40대의 월급이 가장 많다.
+sns.barplot(data = age_group_income, x = 'age_group', y = 'average_income')
+plt.show()
+````
+#### 막대그래프:
+![프로젝트3번_agegroup_income](https://github.com/proleesh/Project0531/assets/57159010/1f2aa60f-dee0-44bc-9a7c-23b19115e348)
+>결론: 40대의 월급이 가장 많다.
+
+## 4. 성별 월급 차이는 연령대별로 다를까?
+
+#### 실현 코드:
+```
+plt.rcParams['font.family'] = 'D2Coding'
+
+raw_welfare = pd.read_spss('C:\대학 자료\빅데이터기초및실습\과제\Koweps_hpwc14_2019_beta2.sav')
+welfare = raw_welfare.copy()
+welfare = welfare.rename(columns = {'h14_g3':'sex',
+                                    'h14_g4':'birth',
+                                    'h14_g10':'marriage_type',
+                                    'h14_g11':'religion',
+                                    'p1402_8aq1':'income',
+                                    'h14_eco9':'code_job',
+                                    'h14_reg7':'code_region'})
+
+# 성별 항목 이름 부여
+welfare['sex'] = np.where(welfare['sex'] == 1, 'male', 'female')
+
+# birth열로 나이 계산해 age열 생성
+welfare['age'] = 2019-welfare['birth']
+
+# 10대~90대 구간의 경계값 설정
+bins = [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
+labels = ['10대', '20대', '30대', '40대', '50대', '60대', '70대', '80대', '90대']
+
+# 경계값을 기준으로 나누고, 라벨을 붙여서 welfare 데이터프레임에 age_group열을 만듦
+welfare['age_group'] = pd.cut(welfare['age'], bins=bins, labels=labels, right=False)
+
+# income열에 결측값이 있는 행 제거
+welfare = welfare.dropna(subset = ['income'])
+
+# female이 들어가는 행에서 'sex', 'age_group', 'income'열만 추출
+female_data = welfare[welfare['sex'] == 'female'][['sex', 'age_group', 'income']]
+# female_data에서 나이대별 월급 평균표 생성
+female_age_group_income = female_data\
+    .groupby('age_group', as_index = False)\
+        .agg(average_income = ('income', 'mean'))
+
+# female_data와 동일한 작업
+male_data = welfare[welfare['sex'] == 'male'][['sex', 'age_group', 'income']]
+male_age_group_income = male_data\
+    .groupby('age_group', as_index = False)\
+        .agg(average_income = ('income', 'mean'))
+
+# x축 구간 나누기
+x = np.arange(9)
+
+# Female, Male 그래프
+plt.bar(x - 0.2, female_age_group_income['average_income'], width=0.4, color='magenta', label='Female')
+plt.bar(x + 0.2, male_age_group_income['average_income'], width=0.4, color='cyan', label='Male')
+
+# 그래프 서식
+plt.title('Average Income by Age Group')
+plt.xticks(x, female_age_group_income['age_group'])
+plt.ylabel('Average Income')
+plt.legend()
+
+# 성별에 따른 월급은 90대를 제외한 구간에서 남성이 여성보다 많고, 그 차이는 50대에서 가장 크게 나타난다.
+plt.show()
+```
+#### 막대그래프
+![프로젝트4번_sex_agegroup_income](https://github.com/proleesh/Project0531/assets/57159010/abac750f-7c9b-435d-af29-10d8af8469f0)
+
+> 결론: 성별에 따른 월급은 90대를 제외한 구간에서 남성이 여성보다 많고, 그 차이는 50대에서 가장 크게 나타난다.
+
+## 5. 어떤 직업이 월급을 가장 많이 받을까? [이성혁님 작성]
 #### 실현 코드:
 ```
 # 작업 변수 검토 및 전처리하기
