@@ -2,7 +2,7 @@
 =========================================
 ## 시작일시: 2023.05.31
 =========================================
-## 프로젝트 팀원: 송우석(2,3,4번 완성 끝), 이성혁(5번완성, 6번작업중... , 7번작업중...)
+## 프로젝트 팀원: 송우석(2,3,4번 완성 끝), 이성혁(5번완성, 6번완성, 7번완성)
 ## 분석하고자 하는 문제 정의 (가설)
 > 1. 성별에 따라 월급이 다를까?
 > 2. 몇 살 때 월급을 가장 많이 받을까?
@@ -243,3 +243,93 @@ sns.barplot(data = job_income, x = 'code_job', y = 'mean_income')
 #### 막대그래프
 ![highest_job_code](https://github.com/proleesh/Project0531/assets/57159010/2bb89ea9-734a-4481-998e-f71a70d230f0)
 > 결론: 직업코드: 241(의료 진료 전문가)이 가장 많이 받는다.
+
+## 6. 성별로 어떤 직업이 가장 많을까?
+
+#### 실현 코드:
+```
+# 데이터 불러오기
+raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
+
+# 복수본 만들기
+welfare = raw_welfare.copy()
+
+# 데이터 검토하기
+welfare # 앞부분, 뒷부분 출력
+welfare.shape # 행, 열 개수 출력
+welfare.info() # 변수 속성 출력
+welfare.describe() # 요약 통계량
+
+welfare = welfare.rename(columns = {
+    'h14_g3' : 'sex',
+    'h14_g4' : 'birth',
+    'h14_g10' : 'marriage_type',
+    'h14_g11' : 'religion',
+    'p1402_8aq1' : 'income',
+    'h14_eco9' : 'code_job',
+    'h14_reg7' : 'code_region'
+})
+# 성별과 직업 변수 선택
+gender_job = welfare[['sex', 'code_job']]
+
+# 성별과 직업별 개수 계산
+gender_job_count = gender_job.groupby(['sex', 'code_job']).size().reset_index(name='count')
+
+# 성별에 따른 가장 많은 직업별 평균 소득 계산
+gender_job_income = welfare.groupby(['sex', 'code_job'])['income'].mean().reset_index()
+
+# 성별에 따른 가장 많은 직업 추출
+most_common_jobs = gender_job_income.groupby('sex')['income'].idxmax()
+most_common_jobs = gender_job_income.loc[most_common_jobs]
+
+# 시각화
+sns.barplot(data=most_common_jobs, x= 'code_job', y='income', hue='sex')
+```
+#### 막대그래프
+<img src="./img/프로젝트6번.png">
+
+> 결론: 직업코드: 241(의료 진료 전문가)이 가장 많다.
+
+## 7. 종교가 있으면 이혼을 덜 할까?
+
+#### 실현 코드:
+```
+# 데이터 불러오기
+raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
+
+# 복수본 만들기
+welfare = raw_welfare.copy()
+
+# 데이터 검토하기
+welfare # 앞부분, 뒷부분 출력
+welfare.shape # 행, 열 개수 출력
+welfare.info() # 변수 속성 출력
+welfare.describe() # 요약 통계량
+
+welfare = welfare.rename(columns = {
+    'h14_g3' : 'sex',
+    'h14_g4' : 'birth',
+    'h14_g10' : 'marriage_type',
+    'h14_g11' : 'religion',
+    'p1402_8aq1' : 'income',
+    'h14_eco9' : 'code_job',
+    'h14_reg7' : 'code_region'
+})
+# 종교와 이혼 변수 선택
+religion_divorce = welfare[['religion', 'marriage_type']]
+
+# 종교와 이혼 여부 변환
+religion_divorce['divorced'] = np.where(religion_divorce['marriage_type'] == 3, 1, 0)
+
+# 종교별 이혼 비율 계산
+divorce_ratio = religion_divorce.groupby('religion')['divorced'].mean().reset_index()
+
+# 시각화
+sns.barplot(data=divorce_ratio, x='religion', y='divorced')
+
+
+```
+#### 막대그래프
+<img src=./img/프로젝트7번.png>
+
+> 결론: 아닙니다.
