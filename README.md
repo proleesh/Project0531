@@ -68,7 +68,15 @@ sns.barplot(data = sex_income, x = 'sex', y = 'mean_income')
 
 #### 실현 코드:
 ```
-plt.rcParams['font.family'] = 'D2Coding'
+# 작성자: 송우석
+# 2. 몇 살 때 월급을 가장 많이 받을까?
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# plt.rcParams['font.family'] = 'D2Coding'
 
 raw_welfare = pd.read_spss('../Koweps_hpwc14_2019_beta2.sav')
 welfare = raw_welfare.copy()
@@ -86,19 +94,15 @@ age_income = welfare.dropna(subset = ['income'])\
     .groupby('age', as_index = False)\
         .agg(average_income = ('income', 'mean'))
 
-# 10대~90대 구간의 경계값 설정
-bins = [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
-labels = ['10대', '20대', '30대', '40대', '50대', '60대', '70대', '80대', '90대']
-
-# 경계값을 기준으로 나누고, 라벨을 붙여서 age_income 데이터프레임에 age_group열을 만듦
-age_income['age_group'] = pd.cut(age_income['age'], bins=9, labels=labels)
-age_group_income = age_income\
-    .groupby('age_group', as_index = False)\
-        .agg(average_income = ('average_income', 'mean'))
-
-# 40대의 월급이 가장 많다.
-sns.barplot(data = age_group_income, x = 'age_group', y = 'average_income')
+#그래프 출력(x축 눈금이 너무 촘촘해서 5세 단위로 나타냄)
+total_len = len(age_income.index)
+sns.barplot(data = age_income, x = 'age', y = 'average_income')\
+    .set_xticks(np.arange(0, total_len + 1, 5))
 plt.show()
+
+#43세가 평균 월급을 가장 많이 받는다.
+highest_average_income = age_income[age_income['average_income'] == age_income['average_income'].max()]
+print(highest_average_income)
 ```
 
 #### 막대그래프
